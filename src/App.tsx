@@ -36,6 +36,12 @@ import HoverMenus from './pages/practice/advanced/HoverMenus';
 import WebSocketPage from './pages/practice/advanced/WebSocketPage';
 import FlakyElements from './pages/practice/advanced/FlakyElements';
 
+// Real-World Flows
+import RealWorldFlows from './pages/practice/flows/RealWorldFlows';
+import EcommerceFlow from './pages/practice/flows/EcommerceFlow';
+import BankingFlow from './pages/practice/flows/BankingFlow';
+import JobPortalFlow from './pages/practice/flows/JobPortalFlow';
+
 // Expert
 import AuthFlow from './pages/practice/expert/AuthFlow';
 import Rbac from './pages/practice/expert/Rbac';
@@ -86,6 +92,12 @@ export default function App() {
                     <Route path="/practice/hover-menus" element={<HoverMenus />} />
                     <Route path="/practice/websocket" element={<WebSocketPage />} />
                     <Route path="/practice/flaky-elements" element={<FlakyElements />} />
+
+                    {/* Real-World Flows */}
+                    <Route path="/practice/flows" element={<RealWorldFlows />} />
+                    <Route path="/practice/flows/ecommerce" element={<EcommerceFlow />} />
+                    <Route path="/practice/flows/banking" element={<BankingFlow />} />
+                    <Route path="/practice/flows/jobs" element={<JobPortalFlow />} />
 
                     {/* Expert */}
                     <Route path="/practice/auth-flow" element={<AuthFlow />} />

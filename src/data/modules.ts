@@ -184,6 +184,43 @@ export const modules: Module[] = [
     icon: '🎰',
     tags: ['flaky', 'retry', 'chaos', 'random'],
   },
+  // REAL-WORLD FLOWS
+  {
+    id: 'real-world-flows',
+    title: 'Real-World App Flows',
+    description: 'Complete multi-screen journeys: E-commerce store, online banking, and job portal — all in one module.',
+    difficulty: 'expert',
+    path: '/practice/flows',
+    icon: '🌐',
+    tags: ['e2e', 'flows', 'real-world', 'multi-screen'],
+  },
+  {
+    id: 'ecommerce-flow',
+    title: 'E-Commerce Flow',
+    description: 'Browse → Product Detail → Cart → Checkout → Confirmation with 12 products, filters, promo codes, and order tracking.',
+    difficulty: 'expert',
+    path: '/practice/flows/ecommerce',
+    icon: '🛒',
+    tags: ['e2e', 'ecommerce', 'checkout', 'cart'],
+  },
+  {
+    id: 'banking-flow',
+    title: 'Online Banking Flow',
+    description: 'Dashboard → Fund Transfer → Bill Pay → Statement (CSV export) → Loan Eligibility with real balance state.',
+    difficulty: 'expert',
+    path: '/practice/flows/banking',
+    icon: '🏦',
+    tags: ['banking', 'finance', 'transfer', 'statement'],
+  },
+  {
+    id: 'job-portal-flow',
+    title: 'Job Portal Flow',
+    description: 'Landing → Register (3 steps) → Job Search → Apply (with CV upload) → Application Tracker pipeline.',
+    difficulty: 'expert',
+    path: '/practice/flows/jobs',
+    icon: '💼',
+    tags: ['jobs', 'portal', 'registration', 'tracker'],
+  },
   // EXPERT
   {
     id: 'auth-flow',
