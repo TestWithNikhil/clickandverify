@@ -332,17 +332,6 @@ app.use('/api', (req, res) => {
   res.status(404).json({ error: `Endpoint not found: ${req.method} ${req.path}` });
 });
 
-// ── Serve client (SPA) when built in `dist` ───────────────────────────────────
-const clientDist = path.join(__dirname, '..', 'dist');
-if (fs.existsSync(clientDist)) {
-  app.use(express.static(clientDist));
-
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api') || req.path.startsWith('/ws')) return next();
-    res.sendFile(path.join(clientDist, 'index.html'));
-  });
-}
-
 // ── Start ─────────────────────────────────────────────────────────────────────
 server.listen(PORT, () => {
   console.log(`\n⚡ ClickAndVerify API Server`);
