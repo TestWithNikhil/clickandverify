@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://clickandverify.onrender.com/sitemap.xml
