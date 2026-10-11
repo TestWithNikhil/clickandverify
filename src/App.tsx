@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { InspectorProvider } from './context/InspectorContext';
@@ -33,7 +33,7 @@ const routeMeta: Record<string, { title: string; description: string }> = {
   },
   '/practice/table': {
     title: 'Table Practice | ClickAndVerify',
-    description: 'Interact with data tables, row selection, sorting, and table assertions for browser automation automation.',
+    description: 'Interact with data tables, row selection, sorting, and table assertions for browser automation testing.',
   },
   '/practice/buttons': {
     title: 'Button Interactions Practice | ClickAndVerify',
@@ -145,71 +145,95 @@ const routeMeta: Record<string, { title: string; description: string }> = {
   },
 };
 
+function upsertMetaTag(attributes: Record<string, string>, tagName: 'meta' | 'link' = 'meta') {
+  const selector = tagName === 'meta'
+    ? Object.entries(attributes).find(([key]) => key === 'property' || key === 'name')?.[1]
+    : 'canonical';
+
+  if (!selector) {
+    return;
+  }
+
+  const key = tagName === 'meta' ? (attributes.property ? 'property' : 'name') : 'rel';
+  let tag: HTMLElement | null = null;
+
+  if (tagName === 'meta') {
+    tag = document.head.querySelector(`meta[${key}="${selector}"]`);
+  } else {
+    tag = document.head.querySelector('link[rel="canonical"]');
+  }
+
+  if (!tag) {
+    tag = document.createElement(tagName);
+    if (tagName === 'meta') {
+      tag.setAttribute(key, selector);
+    } else {
+      tag.setAttribute('rel', 'canonical');
+    }
+    document.head.appendChild(tag);
+  }
+
+  Object.entries(attributes).forEach(([attr, value]) => {
+    tag?.setAttribute(attr, value);
+  });
+}
+
 function SeoMeta() {
   const location = useLocation();
 
   useEffect(() => {
-    const baseUrl = 'https://clickandverify.onrender.com';
     const pathname = location.pathname || '/';
     const meta = routeMeta[pathname] ?? routeMeta['/'];
+    const baseUrl = 'https://clickandverify.onrender.com';
     const canonicalUrl = `${baseUrl}${pathname === '/' ? '' : pathname}`;
 
     document.title = meta.title;
 
-    const setMeta = (selector: string, value: string, attr = 'content') => {
-      let element = document.head.querySelector(selector) as HTMLMetaElement | null;
-      if (!element) {
-        element = document.createElement('meta');
-        element.setAttribute('name' in attr ? 'name' : 'property', selector.includes('og:') ? selector.replace('meta[property="', '').replace('"]', '') : selector.replace('meta[name="', '').replace('"]', ''));
-      }
+    upsertMetaTag({ name: 'description', content: meta.description });
+    upsertMetaTag({ name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' });
+    upsertMetaTag({ property: 'og:title', content: meta.title });
+    upsertMetaTag({ property: 'og:description', content: meta.description });
+    upsertMetaTag({ property: 'og:type', content: 'website' });
+    upsertMetaTag({ property: 'og:url', content: canonicalUrl });
+    upsertMetaTag({ property: 'og:site_name', content: 'ClickAndVerify' });
+    upsertMetaTag({ name: 'twitter:card', content: 'summary_large_image' });
+    upsertMetaTag({ name: 'twitter:title', content: meta.title });
+    upsertMetaTag({ name: 'twitter:description', content: meta.description });
 
-      if (selector.startsWith('meta[name="')) {
-        element.setAttribute('name', selector.replace('meta[name="', '').replace('"]', ''));
-      }
-      if (selector.startsWith('meta[property="')) {
-        element.setAttribute('property', selector.replace('meta[property="', '').replace('"]', ''));
-      }
-      element.setAttribute('content', value);
-      document.head.appendChild(element);
+    const canonical = document.head.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonical) {
+      const link = document.createElement('link');
+      link.setAttribute('rel', 'canonical');
+      document.head.appendChild(link);
+    }
+    const finalCanonical = document.head.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (finalCanonical) {
+      finalCanonical.setAttribute('href', canonicalUrl);
+    }
+
+    const schemaId = 'clickandverify-schema';
+    let jsonLd = document.getElementById(schemaId) as HTMLScriptElement | null;
+    const schema = {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'ClickAndVerify',
+      url: baseUrl,
+      description: meta.description,
+      inLanguage: 'en',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: `${baseUrl}/?q={search_term_string}`,
+        'query-input': 'required name=search_term_string',
+      },
     };
 
-    const descriptionTag = document.head.querySelector('meta[name="description"]') || document.createElement('meta');
-    descriptionTag.setAttribute('name', 'description');
-    descriptionTag.setAttribute('content', meta.description);
-    document.head.appendChild(descriptionTag);
-
-    const ogTitleTag = document.head.querySelector('meta[property="og:title"]') || document.createElement('meta');
-    ogTitleTag.setAttribute('property', 'og:title');
-    ogTitleTag.setAttribute('content', meta.title);
-    document.head.appendChild(ogTitleTag);
-
-    const ogDescriptionTag = document.head.querySelector('meta[property="og:description"]') || document.createElement('meta');
-    ogDescriptionTag.setAttribute('property', 'og:description');
-    ogDescriptionTag.setAttribute('content', meta.description);
-    document.head.appendChild(ogDescriptionTag);
-
-    const ogUrlTag = document.head.querySelector('meta[property="og:url"]') || document.createElement('meta');
-    ogUrlTag.setAttribute('property', 'og:url');
-    ogUrlTag.setAttribute('content', canonicalUrl);
-    document.head.appendChild(ogUrlTag);
-
-    const ogTypeTag = document.head.querySelector('meta[property="og:type"]') || document.createElement('meta');
-    ogTypeTag.setAttribute('property', 'og:type');
-    ogTypeTag.setAttribute('content', 'website');
-    document.head.appendChild(ogTypeTag);
-
-    const twitterDescriptionTag = document.head.querySelector('meta[name="twitter:description"]') || document.createElement('meta');
-    twitterDescriptionTag.setAttribute('name', 'twitter:description');
-    twitterDescriptionTag.setAttribute('content', meta.description);
-    document.head.appendChild(twitterDescriptionTag);
-
-    let canonical = document.head.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-    if (!canonical) {
-      canonical = document.createElement('link');
-      canonical.setAttribute('rel', 'canonical');
-      document.head.appendChild(canonical);
+    if (!jsonLd) {
+      jsonLd = document.createElement('script');
+      jsonLd.id = schemaId;
+      jsonLd.type = 'application/ld+json';
+      document.head.appendChild(jsonLd);
     }
-    canonical.setAttribute('href', canonicalUrl);
+    jsonLd.textContent = JSON.stringify(schema);
   }, [location.pathname]);
 
   return null;
@@ -331,7 +355,6 @@ export default function App() {
                   </Routes>
                 </main>
 
-                {/* Footer */}
                 <footer className="border-t border-gray-200 dark:border-gray-800 py-4 px-6 text-center text-xs text-gray-400 dark:text-gray-600" data-testid="footer">
                   ⚡ ClickAndVerify — Automation Testing Practice Sandbox — No real data collected
                 </footer>
