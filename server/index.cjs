@@ -333,6 +333,16 @@ app.use('/api', (req, res) => {
 });
 
 app.use(express.static(path.join(__dirname, '../dist')));
+
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.send('User-agent: *\nAllow: /\n\nSitemap: https://clickandverify.onrender.com/sitemap.xml\n');
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/sitemap.xml'));
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
